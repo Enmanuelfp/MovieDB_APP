@@ -26,6 +26,8 @@ class MoviesViewModel @Inject constructor(
         MutableStateFlow<Boolean>(false)
     }
 
+    private var nextIndex = 0
+
     val isLoading: Flow<Boolean> get() = _isLoading
 
     val movies: Flow<List<MoviesEntity>> by lazy {
@@ -40,13 +42,17 @@ class MoviesViewModel @Inject constructor(
     }
 
 
-    fun addMovie(index:Int) {
+    fun addMovie() {
         if (!_isLoading.value) {
             viewModelScope.launch(Dispatchers.IO) {
                 _isLoading.value = true
-                val newMovie = repo.getOneMovieFromApi(index)
+                try {
+                    val newMovie = repo.getOneMovieFromApi(nextIndex)
+                    nextIndex++ // Incrementar el índice para la próxima adición
+                } catch (e: Exception) {
+                    // Manejar el error si el índice está fuera de rango
+                }
                 _isLoading.value = false
-                // Cargar de nuevo las películas después de agregar
                 loadMoviesFromDb()
             }
         }

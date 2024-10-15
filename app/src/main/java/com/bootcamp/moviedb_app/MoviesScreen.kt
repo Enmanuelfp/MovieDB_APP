@@ -49,7 +49,7 @@ fun MoviesScreen(viewModel: MoviesViewModel = hiltViewModel()) {
                 title = { Text("Simple Rest API + Room", color = Color.White) },
                 actions = {
                     IconButton(
-                        onClick = { viewModel.addMovie(viewModel.state.value.movies.size) }
+                        onClick = { viewModel.addMovie() }
                     ) {
                         Icon(Icons.Default.Add, "Add", tint = Color.White)
                     }
