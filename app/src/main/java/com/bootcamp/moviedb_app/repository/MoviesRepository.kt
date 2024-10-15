@@ -5,50 +5,58 @@ import com.bootcamp.moviedb_app.datasource.RestDataSource
 import com.bootcamp.moviedb_app.model.Movie
 import com.bootcamp.moviedb_app.model.MoviesDao
 import com.bootcamp.moviedb_app.model.MoviesEntity
+import com.bootcamp.moviedb_app.util.Constants.Companion.IMAGE_BASE_URL
+
 
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface MoviesRepository {
-    suspend fun getMoviesFromApi(page: Int): List<Movie>
-   suspend fun getMoviesFromDb(): Flow<List<MoviesEntity>>
+
+    suspend fun getOneMovieFromApi(index: Int): MoviesEntity
+
+     fun getMoviesFromDb(): Flow<List<MoviesEntity>>
+
+    suspend fun deleteOneMovie(toDelete: MoviesEntity)
 }
 
 class MoviesRepositoryImp @Inject constructor(
     private val restDataSource: RestDataSource,
     private val moviesDao: MoviesDao
 ) : MoviesRepository {
+    override suspend fun getOneMovieFromApi(index: Int): MoviesEntity {
+        val response = restDataSource.getMovies().results // Obtén la lista completa de películas
+        if (response.isNotEmpty() && index in response.indices) {
+            val movieResponse = response[index] // Usa el índice proporcionado
 
-    override suspend fun getMoviesFromApi(page: Int): List<Movie> {
-        val response = restDataSource.getMovies(page = page)
-        Log.d("MoviesRepository", "Fetching movies from API, page: $page")
-        if (response.isSuccessful) {
-
-            Log.d("MoviesRepository", "Response successful: ${response.body()}")
-            val moviesResponse = response.body()?.results ?: emptyList()
-
-            moviesResponse.forEach { movie ->
-                val movieEntity = MoviesEntity(
-                    id = movie.id,
-                    original_title = movie.original_title,
-                    poster_path = movie.poster_path,
-                    release_date = movie.release_date,
-                    vote_average = movie.vote_average
-
-                )
-                moviesDao.insertMovies(listOf(movieEntity))
-            }
-
-            return moviesResponse
+            val movie = MoviesEntity(
+                id = movieResponse.id,
+                original_title = movieResponse.original_title,
+                poster_path = IMAGE_BASE_URL + movieResponse.poster_path,
+                release_date = movieResponse.release_date,
+                vote_average = movieResponse.vote_average
+            )
+            moviesDao.insertOneMovie(movie)
+            return movie
         } else {
-            Log.e("MoviesRepository", "Error fetching movies: ${response.code()} ${response.message()}") // Log de error
-            throw Exception("Error al recuperar la informacion desde la api")
+            throw Exception("Índice fuera de rango o no hay películas disponibles.")
         }
-
     }
 
-    override  suspend fun getMoviesFromDb(): Flow<List<MoviesEntity>> {
+
+
+
+    override fun getMoviesFromDb(): Flow<List<MoviesEntity>> {
         return moviesDao.getMovies()
     }
 
+
+
+    override suspend fun deleteOneMovie(toDelete: MoviesEntity) = moviesDao.deleteMovie(toDelete)
 }
+
+
+
+
+
+
