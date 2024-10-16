@@ -12,3 +12,4 @@ data class MoviesEntity(
     val release_date: String,
     val vote_average: Float
 )
+

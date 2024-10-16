@@ -33,7 +33,7 @@ class MoviesViewModel @Inject constructor(
     val movies: Flow<List<MoviesEntity>> by lazy {
         repo.getMoviesFromDb()
     }
-    private fun loadMoviesFromDb() {
+     fun loadMoviesFromDb() {
         viewModelScope.launch {
             repo.getMoviesFromDb().collect { moviesList ->
                 _state.value = _state.value.copy(movies = moviesList)
@@ -47,7 +47,7 @@ class MoviesViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 _isLoading.value = true
                 try {
-                    val newMovie = repo.getOneMovieFromApi(nextIndex)
+                    repo.getOneMovieFromApi(nextIndex)
                     nextIndex++ // Incrementar el índice para la próxima adición
                 } catch (e: Exception) {
                     // Manejar el error si el índice está fuera de rango
@@ -61,6 +61,7 @@ class MoviesViewModel @Inject constructor(
     fun deleteMovie(toDelete: MoviesEntity) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.deleteOneMovie(toDelete)
+            nextIndex--
         }
     }
 

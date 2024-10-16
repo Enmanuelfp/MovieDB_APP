@@ -1,10 +1,8 @@
 package com.bootcamp.moviedb_app.datasource
 
-import com.bootcamp.moviedb_app.model.Movie
 import com.bootcamp.moviedb_app.model.MoviesResponse
 import com.bootcamp.moviedb_app.util.Constants.Companion.API_KEY
 import com.bootcamp.moviedb_app.util.Constants.Companion.ENDPOINT
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -17,3 +15,4 @@ interface RestDataSource {
         @Query("language") language: String = "en-US"
     ): MoviesResponse
 }
+

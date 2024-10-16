@@ -28,7 +28,6 @@ class MoviesRepositoryImp @Inject constructor(
         val response = restDataSource.getMovies().results // Obtén la lista completa de películas
         if (response.isNotEmpty() && index in response.indices) {
             val movieResponse = response[index] // Usa el índice proporcionado
-
             val movie = MoviesEntity(
                 id = movieResponse.id,
                 original_title = movieResponse.original_title,
